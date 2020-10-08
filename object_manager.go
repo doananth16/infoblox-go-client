@@ -9,13 +9,13 @@ import (
 
 type IBObjectManager interface {
 	AllocateIP(netview string, cidr string, ipAddr string, macAddress string, name string, ea EA) (*FixedAddress, error)
-	AllocateNetwork(netview string, cidr string, prefixLen uint, name string) (network *Network, err error)
+	AllocateNetwork(netview string, cidr string, prefixLen uint, name string, comment string) (network *Network, err error)
 	CreateARecord(netview string, dnsview string, recordname string, cidr string, ipAddr string, ea EA) (*RecordA, error)
 	CreateCNAMERecord(canonical string, recordname string, dnsview string, ea EA) (*RecordCNAME, error)
 	CreateDefaultNetviews(globalNetview string, localNetview string) (globalNetviewRef string, localNetviewRef string, err error)
 	CreateEADefinition(eadef EADefinition) (*EADefinition, error)
 	CreateHostRecord(enabledns bool, recordName string, netview string, dnsview string, cidr string, ipAddr string, macAddress string, ea EA) (*HostRecord, error)
-	CreateNetwork(netview string, cidr string, name string, comment string) (*Network, error)
+	CreateNetwork(netview string, cidr string, name string) (*Network, error)
 	CreateNetworkContainer(netview string, cidr string) (*NetworkContainer, error)
 	CreateNetworkView(name string) (*NetworkView, error)
 	CreatePTRRecord(netview string, dnsview string, recordname string, cidr string, ipAddr string, ea EA) (*RecordPTR, error)
@@ -115,7 +115,7 @@ func (objMgr *ObjectManager) CreateDefaultNetviews(globalNetview string, localNe
 	return
 }
 
-func (objMgr *ObjectManager) CreateNetwork(netview string, cidr string, name string, comment string) (*Network, error) {
+func (objMgr *ObjectManager) CreateNetwork(netview string, cidr string, name string) (*Network, error) {
 	network := NewNetwork(Network{
 		NetviewName: netview,
 		Cidr:        cidr,
@@ -124,9 +124,7 @@ func (objMgr *ObjectManager) CreateNetwork(netview string, cidr string, name str
 	if name != "" {
 		network.Ea["Network Name"] = name
 	}
-	if comment != "" {
-		network.Ea["Comment"] = comment
-	}
+
 	ref, err := objMgr.connector.CreateObject(network)
 	if err != nil {
 		return nil, err
@@ -302,7 +300,7 @@ func (objMgr *ObjectManager) AllocateIP(netview string, cidr string, ipAddr stri
 	return fixedAddr, err
 }
 
-func (objMgr *ObjectManager) AllocateNetwork(netview string, cidr string, prefixLen uint, name string) (network *Network, err error) {
+func (objMgr *ObjectManager) AllocateNetwork(netview string, cidr string, prefixLen uint, name string, comment string) (network *Network, err error) {
 	network = nil
 
 	networkReq := NewNetwork(Network{
@@ -311,6 +309,9 @@ func (objMgr *ObjectManager) AllocateNetwork(netview string, cidr string, prefix
 		Ea:          objMgr.getBasicEA(true)})
 	if name != "" {
 		networkReq.Ea["Network Name"] = name
+	}
+	if comment != "" {
+		networkReq.Ea["Comment"] = comment
 	}
 
 	ref, err := objMgr.connector.CreateObject(networkReq)
