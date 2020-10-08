@@ -15,7 +15,7 @@ type IBObjectManager interface {
 	CreateDefaultNetviews(globalNetview string, localNetview string) (globalNetviewRef string, localNetviewRef string, err error)
 	CreateEADefinition(eadef EADefinition) (*EADefinition, error)
 	CreateHostRecord(enabledns bool, recordName string, netview string, dnsview string, cidr string, ipAddr string, macAddress string, ea EA) (*HostRecord, error)
-	CreateNetwork(netview string, cidr string, name string) (*Network, error)
+	CreateNetwork(netview string, cidr string, name string, comment string) (*Network, error)
 	CreateNetworkContainer(netview string, cidr string) (*NetworkContainer, error)
 	CreateNetworkView(name string) (*NetworkView, error)
 	CreatePTRRecord(netview string, dnsview string, recordname string, cidr string, ipAddr string, ea EA) (*RecordPTR, error)
